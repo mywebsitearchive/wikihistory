@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+    <head>
+	<meta charset="utf-8">
+        <style>
+            input{
+                width: 400px;
+                margin-top: 5px;
+                float: right;
+            }
+            .box{
+                height: 30px;
+                width: 600px;
+                margin-top: 10px;
+                overflow: hidden;
+            }
+            #lista{
+                width: 600px;
+                margin: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="lista"></div><br>
+
+        <div style="width: 600px; height: 200px; margin: auto;">
+            
+            <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Article</p>
+            <input id="a"></input></div>
+            
+            <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Start year</p>
+            <input id="year"></input></div>
+            
+            <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Start month</p>
+            <input id="month"></input></div>
+            
+            <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Start day</p>
+            <input id="day"></input></div>
+            
+            <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Interval days</p>
+            <input id="interval"></input></div>
+            
+            <button onclick="addTitle()">create list</button>
+            <button onclick="reset()">clear</button>
+        </div>
+
+        <script>
+            var addTitle=()=>{
+                reset()
+                var x = document.getElementById("a").value.replace("https://en.wikipedia.org/wiki/", "").replaceAll(" ", "_")
+                var year = Number(document.getElementById("year").value)
+                var month = Number(document.getElementById("month").value)
+                var day = Number(document.getElementById("day").value)
+                var interval = Number(document.getElementById("interval").value)
+                var now = new Date().getTime()
+                if (year != "" && month != "" && Number(interval)>2){
+                    if (day == ""){
+                        day = 1
+                    }
+                    var unixTime = (year-1970)*31557600000+(month-1)*2628000000+(day-1)*86400000
+                    while (unixTime < now){
+                        let newTime = new Date(unixTime)
+                        var element= document.createElement("a")
+                        element.innerHTML = `<a href="https://en.wikipedia.org/w/index.php?title=${x}&date-range-to=${String(newTime.getFullYear())}-${String(newTime.getMonth()+1).padStart(2, "0")}-${String(newTime.getDate()).padStart(2, "0")}&tagfilter=&action=history">${"From "+(newTime.getDate())+"."+(newTime.getMonth()+1)+"."+newTime.getFullYear()}</a><br>`
+                        document.getElementById("lista").appendChild(element)
+                        unixTime+=interval*86400000
+                    }
+                }
+            }
+            var reset=()=>{
+                document.getElementById("lista").innerHTML=""
+            }
+        </script>
+    </body>
+</html>
