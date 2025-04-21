@@ -3,74 +3,143 @@
     <head>
 	<meta charset="utf-8">
         <style>
+            body{
+                width: 1000px;
+                margin: auto;
+                font-family: Arial, Helvetica, sans-serif;
+            }
             input{
-                height: 40px;
-                width: 800px;
+                width: 200px;
                 margin-top: 5px;
                 float: right;
             }
             .box{
-                height: 60px;
-                width: 1200px;
-                margin-top: 20px;
+                height: 30px;
+                width: 400px;
+                margin-top: 10px;
                 overflow: hidden;
             }
             #lista{
                 width: 600px;
                 margin: auto;
             }
+            #col1, #col2{
+                margin-top: 40px;
+                width: 500px;
+                float: left;
+            }
         </style>
     </head>
-    <body>
-        <div id="lista"></div><br>
+    <body onkeydown="f()">
+        <div id="col1">
+            <div style="width: 600px; height: 200px; margin: auto;">
+                
+                <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Article</p>
+                    <input id="a"></input></div>
+                    
+                <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Start year</p>
+                    <input id="year"></input></div>
+                        
+                <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Start day</p>
+                    <input id="day"></input></div>
+                            
+                <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Start month</p>
+                    <input id="month"></input></div>
+                
+                <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Interval days</p>
+                    <input id="interval"></input></div>
+                
+                <div class="box"><p style="float: left; margin-top: 5px; width: 150px;">Language</p>
+                    <input id="lang"></input></div><br><br>
 
-        <div style="width: 1200px; height: 400px; margin: auto;">
-            
-            <div class="box"><p style="float: left; margin-top: 10px; width: 250px;">Article</p>
-            <input id="a"></input></div>
-            
-            <div class="box"><p style="float: left; margin-top: 10px; width: 250px;">Start year</p>
-            <input id="year"></input></div>
-            
-            <div class="box"><p style="float: left; margin-top: 10px; width: 250px;">Start month</p>
-            <input id="month"></input></div>
-            
-            <div class="box"><p style="float: left; margin-top: 10px; width: 250px;">Start day</p>
-            <input id="day"></input></div>
-            
-            <div class="box"><p style="float: left; margin-top: 10px; width: 250px;">Interval days</p>
-            <input id="interval"></input></div>
-            
-            <button onclick="addTitle()">create list</button>
-            <button onclick="reset()">clear</button>
+
+                <button onclick="addTitle()">create list</button>
+                <button onclick="reset()">clear</button>
+                <button onclick="resetAll()">clear all</button><br><br>
+                <p id="error">No errors 👍</p>
+                
+            </div>
         </div>
-
+        <div id="col2">
+            
+            <div id="lista"></div><br>
+        </div>
+        
+        
+        
         <script>
+            var f=()=>{
+                var key = event.key;
+            if(key == "Enter"){
+                addTitle()
+            }
+            }
             var addTitle=()=>{
                 reset()
-                var x = document.getElementById("a").value.replace("https://en.wikipedia.org/wiki/", "").replaceAll(" ", "_")
+                var x = document.getElementById("a").value.replace("https://en.wikipedia.org/wiki/", "").replaceAll(" ", "_").replace("https://fi.wikipedia.org/wiki/", "")
                 var year = Number(document.getElementById("year").value)
                 var month = Number(document.getElementById("month").value)
                 var day = Number(document.getElementById("day").value)
                 var interval = Number(document.getElementById("interval").value)
+                var lang = document.getElementById("lang").value
+                if(lang==""){
+                    lang="en"
+                }
                 var now = new Date().getTime()
-                if (year != "" && month != "" && Number(interval)>2){
+                if (year != "" ){
                     if (day == ""){
-                        day = 1
+                        day = new Date().getDate()
+                    }
+                    if (month == ""){
+                        month = new Date().getMonth()+1
+                    }
+                    if(interval==""){
+                        interval = 365.25
                     }
                     var unixTime = (year-1970)*31557600000+(month-1)*2628000000+(day-1)*86400000
                     while (unixTime < now){
                         let newTime = new Date(unixTime)
                         var element= document.createElement("a")
-                        element.innerHTML = `<a href="https://en.wikipedia.org/w/index.php?title=${x}&date-range-to=${String(newTime.getFullYear())}-${String(newTime.getMonth()+1).padStart(2, "0")}-${String(newTime.getDate()).padStart(2, "0")}&tagfilter=&action=history">${"From "+(newTime.getDate())+"."+(newTime.getMonth()+1)+"."+newTime.getFullYear()}</a><br>`
-                        document.getElementById("lista").appendChild(element)
-                        unixTime+=interval*86400000
+                        element.innerHTML = `<a target="_blank" href="https://${lang}.wikipedia.org/w/index.php?title=${x}&date-range-to=${String(newTime.getFullYear())}-${String(newTime.getMonth()+1).padStart(2, "0")}-${String(newTime.getDate()).padStart(2, "0")}&tagfilter=&action=history">${"From "+(newTime.getDate())+"."+(newTime.getMonth()+1)+"."+newTime.getFullYear()}</a><br>`
+                            document.getElementById("lista").appendChild(element)
+                            unixTime+=interval*86400000
+                    }
+                }
+                else if (interval==""&&year != "" && month != ""){
+                    var unixTime = (year-1970)*31557600000+(month-1)*2628000000+(day-1)*86400000;
+
+                    let newTime = new Date(unixTime);
+                    document.getElementById("lista").innerHTML=`<a target="_blank" href="https://${lang}.wikipedia.org/w/index.php?title=${x}&date-range-to=${String(newTime.getFullYear())}-${String(newTime.getMonth()+1).padStart(2, "0")}-${String(newTime.getDate()).padStart(2, "0")}&tagfilter=&action=history">${"From "+(newTime.getDate())+"."+(newTime.getMonth()+1)+"."+newTime.getFullYear()}</a><br>`;
+                }
+                else{
+
+                    var unixTime = new Date().getTime()-315576000000
+                    while (unixTime < now){
+                        let newTime = new Date(unixTime)
+                        var element= document.createElement("a")
+                        element.innerHTML = `<a target="_blank" href="https://${lang}.wikipedia.org/w/index.php?title=${x}&date-range-to=${String(newTime.getFullYear())}-${String(newTime.getMonth()+1).padStart(2, "0")}-${String(newTime.getDate()).padStart(2, "0")}&tagfilter=&action=history">${"From "+(newTime.getDate())+"."+(newTime.getMonth()+1)+"."+newTime.getFullYear()}</a><br>`
+                            document.getElementById("lista").appendChild(element)
+                            if(interval!=""){
+                                unixTime+=interval*86400000
+                            }
+                            else{
+
+                                unixTime+=31557600000
+                            }
                     }
                 }
             }
             var reset=()=>{
                 document.getElementById("lista").innerHTML=""
             }
+            var resetAll=()=>{
+                document.getElementById("lista").innerHTML=""
+                document.getElementById("a").value=""
+                document.getElementById("year").value=""
+                document.getElementById("day").value=""
+                document.getElementById("month").value=""
+            }
+            
         </script>
     </body>
 </html>
